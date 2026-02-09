@@ -1,0 +1,14 @@
+plugins:
+  # xpdig list all the relationships with a resource (Claim, Composite, or Managed Resource)
+  # Requires 'crossplane' and 'xpdig' cli binaries installed
+  xpdig:
+    shortCut: t
+    confirm: false
+    description: "Crossplane Trace"
+    scopes:
+      - all
+    command: sh
+    background: false
+    args:
+      - -c
+      - xpdig trace -n $([[ $NAMESPACE = "-" ]] && echo "default" || echo "$NAMESPACE") --context $CONTEXT $RESOURCE_NAME.$RESOURCE_GROUP/$NAME
