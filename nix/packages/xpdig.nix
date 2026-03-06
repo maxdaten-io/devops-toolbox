@@ -25,11 +25,11 @@ buildGoModule rec {
     "-X main.version=${version}"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Crossplane trace explorer TUI";
     homepage = "https://github.com/brunoluiz/xpdig";
-    license = licenses.mit;
-    platforms = platforms.linux ++ platforms.darwin;
+    license = lib.licenses.mit;
+    platforms = lib.platforms.linux ++ lib.platforms.darwin;
     mainProgram = "xpdig";
   };
 }

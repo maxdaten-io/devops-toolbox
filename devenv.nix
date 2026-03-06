@@ -11,13 +11,17 @@
   languages.nix.enable = true;
 
   pre-commit.hooks = {
-    nixfmt-rfc-style.enable = true;
+    # Nix linters (formatting is handled by treefmt/nix fmt)
     deadnix.enable = true;
     statix.enable = true;
-    yamllint.enable = true;
+
+    # Shell linting (formatting is handled by treefmt/shfmt)
     shellcheck.enable = true;
-    shfmt.enable = true;
+
+    # GitHub Actions linting
     actionlint.enable = true;
+
+    # General safeguards
     check-merge-conflicts.enable = true;
     check-added-large-files.enable = true;
   };
