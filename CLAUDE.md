@@ -10,16 +10,28 @@ Reusable [devenv](https://devenv.sh) modules that bundle DevOps tools not availa
 
 ## Common Commands
 
+All commands should be run via `devenv shell --no-tui --quiet -- $command`, for example:
+
 ```bash
 # Format all files
-nix fmt
+devenv shell --no-tui --quiet -- nix fmt
 
 # Check flake integrity
-nix flake check
+devenv shell --no-tui --quiet -- nix flake check
 
 # Build packages
-nix build .#xpdig
-nix build .#ash
+devenv shell --no-tui --quiet -- nix build .#xpdig
+devenv shell --no-tui --quiet -- nix build .#ash
+```
+
+## CI Validation
+
+After pushing changes, use the `gh` CLI to check pipeline status and self-validate that CI passes:
+
+```bash
+gh run list --branch <branch-name>
+gh run view <run-id>
+gh run watch <run-id>
 ```
 
 ## Project Structure
