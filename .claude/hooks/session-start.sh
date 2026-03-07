@@ -64,9 +64,22 @@ accept-flake-config = true
 sandbox = false
 build-users-group ="
 
+# Install devenv if not available
+if ! command -v devenv &>/dev/null; then
+  echo "Installing devenv..."
+  nix profile install --accept-flake-config nixpkgs#devenv 2>&1 || true
+fi
+
+# Activate devenv shell environment for subsequent commands
+echo "Activating devenv shell environment..."
+cd "$CLAUDE_PROJECT_DIR"
+DEVENV_ENV=$(devenv print-dev-env --no-tui 2>/dev/null) || true
+if [ -n "$DEVENV_ENV" ]; then
+  echo "$DEVENV_ENV" >>"$CLAUDE_ENV_FILE"
+fi
+
 # Pre-build treefmt formatter so nix fmt is fast during the session
 echo "Pre-building treefmt formatter..."
-cd "$CLAUDE_PROJECT_DIR"
 nix build .#formatter.x86_64-linux --no-link 2>&1 || true
 
 echo "Session start hook completed successfully."
