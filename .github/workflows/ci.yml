@@ -25,9 +25,10 @@ jobs:
           name: devenv
       - name: Install devenv
         run: nix profile install --accept-flake-config github:cachix/devenv/latest
+      - name: Update devenv lock
+        run: devenv update
       - name: Run devenv ci
         run: devenv ci
-
   flake-check:
     name: Flake Check
     runs-on: ubuntu-latest
@@ -40,7 +41,6 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: nix flake check
         run: nix flake check
-
   build-packages:
     name: Build ${{ matrix.package }}
     runs-on: ubuntu-latest
@@ -57,7 +57,6 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Build ${{ matrix.package }}
         run: nix build .#${{ matrix.package }}
-
   formatting:
     name: Formatting
     runs-on: ubuntu-latest
@@ -70,7 +69,6 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check formatting
         run: nix fmt -- --fail-on-change
-
   eval-modules:
     name: Evaluate devenv modules
     runs-on: ubuntu-latest
