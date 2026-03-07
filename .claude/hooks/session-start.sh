@@ -6,37 +6,35 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
 
-# Install Nix using the Determinate Systems installer (idempotent)
+# Install Nix in single-user (no-daemon) mode for containerized environments.
+# The Determinate Systems installer crashes in containers due to PID handling
+# bugs, so we use the official Nix installer instead.
 if ! command -v nix &>/dev/null; then
-  echo "Installing Nix..."
-  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix |
-    sh -s -- install linux --no-confirm --init none 2>&1 || true
+  echo "Installing Nix (single-user mode)..."
+  curl -L https://nixos.org/nix/install | sh -s -- --no-daemon 2>&1 || true
 
-  # The installer may fail on profile setup in sandboxed environments,
-  # but nix binaries are still usable from the store. Set up the profile manually.
-  if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-  else
-    # Find the nix binary in the store and add it to PATH
-    NIX_BIN=$(find /nix/store -maxdepth 2 -name "nix" -path "*/bin/nix" -type f 2>/dev/null | grep "determinate-nix" | head -1)
-    if [ -n "$NIX_BIN" ]; then
-      export PATH="$(dirname "$NIX_BIN"):$PATH"
-    fi
+  # Source the nix profile
+  if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
   fi
 fi
 
 # Ensure nix is on PATH for this session
 if ! command -v nix &>/dev/null; then
-  if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+  elif [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
     . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
   fi
 fi
 
 # Persist Nix environment for subsequent session commands
-if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  echo ". $HOME/.nix-profile/etc/profile.d/nix.sh" >>"$CLAUDE_ENV_FILE"
+elif [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
   echo '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' >>"$CLAUDE_ENV_FILE"
 else
-  echo 'export PATH="/nix/var/nix/profiles/default/bin:$PATH"' >>"$CLAUDE_ENV_FILE"
+  echo 'export PATH="/nix/var/nix/profiles/default/bin:$HOME/.nix-profile/bin:$PATH"' >>"$CLAUDE_ENV_FILE"
 fi
 
 # Enable flakes and accept this project's flake config (extra substituters/public keys)
