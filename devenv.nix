@@ -2,7 +2,10 @@
 {
   packages = with pkgs; [
     git
+    gh
     nix-prefetch
+    treefmt
+    cachix
   ];
 
   languages.nix.enable = true;
