@@ -10,18 +10,18 @@ Reusable [devenv](https://devenv.sh) modules that bundle DevOps tools not availa
 
 ## Common Commands
 
-All commands should be run via `devenv shell --no-tui --quiet -- $command`, for example:
+The devenv shell is activated automatically via the session start hook (`.claude/hooks/session-start.sh`), so commands can be run directly:
 
 ```bash
 # Format all files
-devenv shell --no-tui --quiet -- nix fmt
+nix fmt
 
 # Check flake integrity
-devenv shell --no-tui --quiet -- nix flake check
+nix flake check
 
 # Build packages
-devenv shell --no-tui --quiet -- nix build .#xpdig
-devenv shell --no-tui --quiet -- nix build .#ash
+nix build .#xpdig
+nix build .#ash
 ```
 
 ## CI Validation
