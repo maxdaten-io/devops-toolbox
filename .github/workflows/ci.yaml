@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  nix-check:
+    name: Nix Flake Check
+    runs-on: blacksmith-4vcpu-ubuntu-2204
+    steps:
+      - uses: actions/checkout@v5
+      - uses: maxdaten-io/gitops/.github/actions/nix@main
+      - name: Flake Check
+        run: nix flake check
+
+  devenv-test:
+    name: Devenv Test
+    runs-on: blacksmith-4vcpu-ubuntu-2204
+    steps:
+      - uses: actions/checkout@v5
+      - uses: maxdaten-io/gitops/.github/actions/nix@main
+      - name: Devenv Test
+        run: devenv test
